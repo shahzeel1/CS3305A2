@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main()
 {
@@ -13,8 +14,10 @@ if(fp==NULL)
 	printf("File does not exist");
 	return 0;
 }
+// open file to write to 
+fo = fopen( "cpu_scheduling_output_file.txt", "w+" );
 
-int *queue;
+int *queue = (int* ) malloc (1000*sizeof(int));
 //int *sjfqueue;
 //int *pqueue;
 //int *wqueue;
@@ -24,33 +27,45 @@ int tq;
 int ptime;
 int sum=0;
 float avg;
+int i =0;
 
+queue[i]=23;
+printf("%d",queue[i]);
+
+/*
 
 // until the end of the file is reached...
-printf("%d",feof(fp));
-while (feof(fp)==0)
+if (feof(fp))
 {
-	fscanf(fp,"%s", buff);
-	printf("%s",buff);
-	if (strcmp(buff,"q"))// if new queue is starting get the time quantum and store the processes in an array
-	{
+	printf("File is empty\n");
+}
+
+
+while (!feof(fp))
+{
+	
+	fgets(buff,2,(FILE*)fp);
+	
+	
 	   numq++;// increment the queue number 
-	   fscanf(fp,"%s", buff);// skip over the q val
-	   fscanf(fp,"%s", buff); // skip over the tq chars
-	   fscanf(fp,"%s", buff); // get the tq val
-	   sscanf(buff, "%d", &tq);// store the  time quantum 
-	   fscanf(fp,"%s", buff);// read the first process
-	   while (!strcmp(buff,"\n"))
+	   fgets(buff,7, (FILE*)fp);// skip over the " tq " val
+
+	   fscanf(fp,"%d", &tq); // get the tq val
+	   //printf("The val of tq is: %d\n",tq);
+	   fgets(buff,5, (FILE*)fp);// read the first process
+	printf("The val of buff is: %s\n",buff);
+	   while (strcmp(buff,"\n")!=0)
 	   {
-		   sscanf(buff, "%d", &ptime);// store the process time as an int
-		   *queue = ptime;// store the process time in the queue
+		   fscanf(fp, "%d", &ptime);// store the process time as an int
+printf("The val of ptime is: %d\n",ptime);
+		   queue[i] = ptime;// store the process time in the queue
+		printf("The val of ptime in queue is: %s\n",queue[i]);
 		   nump ++;
-		   queue ++;// increment the memory location in the queue
+		   i ++;// increment the memory location in the queue
 		   fscanf(fp,"%s", buff);// read the next process
 		}
 		
-		// open file to write to 
-		fo = fopen( "cpu_scheduling_output_file.txt", "w+" );
+		
 		fprintf(fo,"Ready Queue 1 Applying FCFS Scheduling: \n");
 		printf("Ready Queue 1 Applying FCFS Scheduling: \n");
 		fprintf(fo,"Order of selection by CPU: \n");
@@ -79,7 +94,7 @@ while (feof(fp)==0)
 		
 		avg = sum/nump;
 		fprintf(fo,"\n\nAverage waiting time for each process: %f\n",avg);
-		printf("\n\nAverage waiting time for each process: %f\n",avg);
+		printf("\n\nAverage waiting time for each process: %f\n",avg);*/
 		/*
 		//SJF Alogrithm
 		queue=queue-nump; // reset queue 
@@ -155,9 +170,9 @@ while (feof(fp)==0)
 				unifinished --;
 				*tqueue
 		*/
-	}
+	
 }
-
+free(queue);
 fclose(fp);
 fclose(fo);
 			
