@@ -2,11 +2,32 @@
 #include <string.h>
 #include <stdlib.h>
 
+void quicksort(int sjfq[], char* pq[], int min, int max);
 int main()
 {
 
+
+
+int *queue = malloc (1000*sizeof(int));
+int *sjfqueue = malloc (1000*sizeof(int));
+char **pqueue = malloc (1000*sizeof(char*));
+char **wqueue = malloc (1000*sizeof(char*));
+int numq=0;
+int nump=0;
+float count=0;
+int tq;
+//int ptime;
+int sum=0;
+float avg;
+//int queuecounter =0;
+char* line = NULL;
+size_t lbsize=0;
+ssize_t lsize;
+char *token;
+int filesize;
+
 FILE *fp, *fo;
-char buff[255];
+
 
 fp = fopen("cpu_scheduling_input_file.txt", "r");
 if(fp==NULL)
@@ -14,56 +35,46 @@ if(fp==NULL)
 	printf("File does not exist");
 	return 0;
 }
+
+
 // open file to write to 
 fo = fopen( "cpu_scheduling_output_file.txt", "w+" );
 
-int *queue = (int* ) malloc (1000*sizeof(int));
-//int *sjfqueue;
-//int *pqueue;
-//int *wqueue;
-int numq=0;
-int nump=0;
-int tq;
-int ptime;
-int sum=0;
-float avg;
-int i =0;
-
-queue[i]=23;
-printf("%d",queue[i]);
-
-/*
-
-// until the end of the file is reached...
-if (feof(fp))
-{
-	printf("File is empty\n");
-}
 
 
-while (!feof(fp))
-{
+
+// until the end of the file is reached 
+//while (!feof(fp))
+//{
+	// get the line for the file 
+	lsize=getline(&line, &lbsize, fp); 
 	
-	fgets(buff,2,(FILE*)fp);
+	token = strtok(line," "); // q
+	numq++;// increment the queue number 
 	
 	
-	   numq++;// increment the queue number 
-	   fgets(buff,7, (FILE*)fp);// skip over the " tq " val
+	token = strtok(NULL," "); // skip the q number 
+	token = strtok(NULL," ");// skip the tq
+	token = strtok(NULL," "); // get the tq value 
+	tq = atoi(token); // convert the token to an int val 
 
-	   fscanf(fp,"%d", &tq); // get the tq val
-	   //printf("The val of tq is: %d\n",tq);
-	   fgets(buff,5, (FILE*)fp);// read the first process
-	printf("The val of buff is: %s\n",buff);
-	   while (strcmp(buff,"\n")!=0)
-	   {
-		   fscanf(fp, "%d", &ptime);// store the process time as an int
-printf("The val of ptime is: %d\n",ptime);
-		   queue[i] = ptime;// store the process time in the queue
-		printf("The val of ptime in queue is: %s\n",queue[i]);
-		   nump ++;
-		   i ++;// increment the memory location in the queue
-		   fscanf(fp,"%s", buff);// read the next process
-		}
+	 
+	 token = strtok(NULL, " "); // read the first process 
+	while (token!=NULL)
+	{
+    
+	pqueue[nump]= token; //  store it in the process queue
+	token = strtok(NULL, " "); // read the first process burst time
+	queue[nump] = atoi(token);//store the burst time 
+	nump++; // increment the number of processes
+	count++; 
+	token = strtok(NULL, " "); // read the next process
+	}
+	
+	
+	   
+		  
+		
 		
 		
 		fprintf(fo,"Ready Queue 1 Applying FCFS Scheduling: \n");
@@ -72,66 +83,73 @@ printf("The val of ptime is: %d\n",ptime);
 		printf("Order of selection by CPU: \n");		
 		
 		// FCFS Algorithm 
-		int i;
-		for(i=1; i<=nump; i++)
+		
+		for(int i=0; i<nump; i++)
 		{
-			printf("here");
-			fprintf(fo,"p%d, ",i);
-			printf("p%d, ",i);
+			fprintf(fo,"%s ",pqueue[i]);
+			printf("%s ",pqueue[i]);
 		}
-		queue = queue-nump;
+		
+		
 		fprintf(fo,"\n\nIndividual waiting time for each process \n");
 		printf("\n\nIndividual waiting time for each process \n");
-		fprintf(fo,"p%d = %d\n",1,0);
-		printf("p%d = %d\n",1,0);
-		for(int i=2; i <= nump; i++)
+		
+		int avgsum=0;
+		
+		for(int i=0; i < nump; i++)
 		{
-			sum+=*queue;
-			fprintf(fo,"p%d = %d\n",i,sum);
-			printf("p%d = %d\n",i, sum);
-			queue++;
+			fprintf(fo,"%s = %d\n",pqueue[i],sum);
+			printf("%s = %d\n",pqueue[i],sum);
+			avgsum+=sum;
+			sum+=queue[i];
+			
+			
 		}	
 		
-		avg = sum/nump;
-		fprintf(fo,"\n\nAverage waiting time for each process: %f\n",avg);
-		printf("\n\nAverage waiting time for each process: %f\n",avg);*/
-		/*
+		avg = avgsum/count;
+		fprintf(fo,"\n\nAverage waiting time for each process: %.1f\n",avg);
+		printf("\n\nAverage waiting time for each process: %.1f\n",avg);
+		
+		
 		//SJF Alogrithm
-		queue=queue-nump; // reset queue 
 		sjfqueue=queue;// equate the two queues 
-		// set up the process queue
-		for(int i=1, i<=nump; i++)
-		{
-			*pqueue=i;
-			pqueue++;
-		}
 		wqueue=pqueue;
-		wqueue=wqueue-nump;
 		 
 		// do a quick sort and change the values of the processes as well 
 		
 		quicksort (sjfqueue, wqueue, 0,nump-1);
 		
-		fprintf(fo,"Ready Queue 1 Applying SJF Scheduling: \n");
-		printf(fo,"Ready Queue 1 Applying SJF Scheduling: \n");
+		fprintf(fo,"\nReady Queue 1 Applying SJF Scheduling: \n");
+		printf("\nReady Queue 1 Applying SJF Scheduling: \n");
+		
+		fprintf(fo,"\nOrder of Selection: \n");
+		printf("\nOrder of Selection: \n");
+		
+		for(int i=0; i<nump; i++)
+		{
+			fprintf(fo,"%s ",wqueue[i]);
+			printf("%s ",wqueue[i]);
+		}
+		fprintf(fo,"\n\nIndividual waiting time for each process \n");
+		printf("\n\nIndividual waiting time for each process \n");
+		
+		
 		sum=0;
-		pqueue=pqueue-nump;
-		sjfqueue=sjfqueue-nump;
-		for(int i=1, i<=nump; i++)
+		avgsum=0;
+		for(int i=0; i<nump; i++)
 		{
 			
-			fprintf(fo,"p%d = %d\n",*wqueue,sum);
-			printf(fo,"p%d = %d\n",*wqueue, sum);
-			sum+=*sjfqueue;
-			wqueue++;
-			sjfqueue++;
+			fprintf(fo,"%s = %d\n",wqueue[i],sum);
+			printf("%s = %d\n",wqueue[i], sum);
+			avgsum+=sum;
+			sum+=sjfqueue[i];
 		}	
 		
-		avg = sum/pnum;
-		fprintf(fo,"\n\nAverage waiting time for each process: %d\n",avg);
-		printf(fo,"\n\nAverage waiting time for each process: %d\n",avg);
+		avg = avgsum/count;
+		fprintf(fo,"\n\nAverage waiting time for each process: %.1f\n",avg);
+		printf("\n\nAverage waiting time for each process: %.1f\n",avg);
 		
-		fprintf(fo,"Ready Queue 1 Applying RR Scheduling: \n");
+	/*	fprintf(fo,"Ready Queue 1 Applying RR Scheduling: \n");
 		printf(fo,"Ready Queue 1 Applying RR Scheduling: \n");
 		
 		
@@ -171,7 +189,7 @@ printf("The val of ptime is: %d\n",ptime);
 				*tqueue
 		*/
 	
-}
+//}
 free(queue);
 fclose(fp);
 fclose(fo);
@@ -184,49 +202,51 @@ fclose(fo);
 			
 	}
 	
-	/*quicksort(sjfq[], pq[], min, max)
+void swap (int* aa, int* ab, char** ba, char** bb)
+{
+	int tempa= *aa;
+			*aa=*ab;
+			*ab = tempa;
+	char* tempb =*ba;
+			*ba=*bb;
+			*bb = tempb;
+}
+int splitter(int sjfq[], char* pq[], int min, int max)
+{
+	int piv = sjfq[max];
+	int i = (min-1);
+	
+	for (int j = min; j<=max-1;j++)
+	{
+		if(sjfq[j]<piv)
+		{
+			i++;
+			swap(&sjfq[i],&sjfq[j],&pq[i],&pq[j]);
+		}
+		
+	}
+	swap(&sjfq[i+1],&sjfq[max],&pq[i+1],&pq[max]);
+	return (i+1);
+}
+	
+			
+	
+void quicksort(int sjfq[], char* pq[], int min, int max)
 	{
 		int split;
-		int part;
-		int lowest;
-		int temp;
+
 		
 		if (min<max)
 		{
 			
-			split = sjfq[max];
-			lowest = (min-1);
+			split = splitter(sjfq,pq,min,max);
 			
-			for (int j=min; j<=max-1; j++)
-			{
-				if(sjdq[j]<split)
-				{
-					lowest++;
-					temp=sfjq[lowest];
-					sfjq[lowest]=sfjq[j];
-					sfjq[j] = temp;
-					
-					temp=pq[lowest];
-					pq[lowest]=pq[j];
-					pq[j] = temp;
-					
-				}
-			}
-					temp=sfjq[lowest+1];
-					sfjq[lowest+1]=sfjq[max];
-					sfjq[max] = temp;
-					
-					temp=pq[lowest+1];
-					pq[lowest+1]=pq[max];
-					pq[max] = temp;
-					
-					part = lowest+1;
-			quicksort(sjfq, pq, min, part-1);
-			quicksort(sjfq, pq, min+1, part);
+			quicksort(sjfq, pq, min, split-1);
+			quicksort(sjfq, pq, split+1, max);
 		}
 	}
 		
-	*/	
+	
 		
 		
 	
